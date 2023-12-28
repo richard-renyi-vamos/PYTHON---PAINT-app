@@ -1,0 +1,67 @@
+import pygame
+import os
+
+# Initialize Pygame
+pygame.init()
+
+# Set up constants
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Set up the display
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Paint with the Mouse")
+clock = pygame.time.Clock()
+
+drawing = False
+brush_size = 10
+draw_color = BLACK
+last_pos = None  # Initialize last_pos
+
+# Create a surface to draw on
+canvas = pygame.Surface((WIDTH, HEIGHT))
+canvas.fill(WHITE)
+
+# Main loop
+running = True
+while running:
+    screen.fill(WHITE)
+    screen.blit(canvas, (0, 0))  # Draw the canvas onto the screen
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left mouse button
+                drawing = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                drawing = False
+                last_pos = None  # Reset last_pos when releasing the mouse button
+        elif event.type == pygame.MOUSEMOTION:
+            if drawing:
+                mouse_x, mouse_y = event.pos
+                if last_pos is None:
+                    last_pos = (mouse_x, mouse_y)
+                pygame.draw.line(canvas, draw_color, last_pos, (mouse_x, mouse_y), brush_size)
+                last_pos = (mouse_x, mouse_y)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c:  # Clear the canvas on pressing 'c' key
+                canvas.fill(WHITE)
+            elif event.key == pygame.K_s:  # Save the canvas on pressing 's' key
+                image_name = "drawing.png"
+                pygame.image.save(canvas, image_name)
+                print(f"Image saved as '{image_name}' in the current directory.")
+                # Optionally, you can specify a directory:
+                # directory = "path/to/save"
+                # pygame.image.save(canvas, os.path.join(directory, image_name))
+                
+
+    pygame.display.flip()
+    clock.tick(FPS)
+
+# Quit Pygame
+pygame.quit()
